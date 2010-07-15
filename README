@@ -1,0 +1,8 @@
+ejabberd_auth_wordpress - Ejabberd authorization module for check user credentials in a WordPress database via php_app.
+
+This module requires php_app. It allows users in a WordPress user database to connect to a Jabber server using their WordPress credentials.
+
+It was developed for im.wordpress.com and generalized for im.wordpress.org.
+
+With this module installed, the 'wordpress' auth_method becomes available:
+{host_config, Host, [{auth_method, wordpress}]}.
