@@ -30,7 +30,7 @@
 	"if ( !function_exists('ejabberd_check_password') ) {"
 	" function ejabberd_check_password($user_login, $user_pass) {"
 	"  $user = get_userdatabylogin($user_login);"
-	"  if ( !$user || $user->user_login != $user_login ) return false;"
+	"  if ( !$user || strcasecmp($user->user_login, $user_login) ) return false;"
 	"  clean_user_cache($user->ID);"
 	"  return !is_wp_error(wp_authenticate($user_login, $user_pass));"
 	" }"
@@ -38,7 +38,7 @@
 	"if ( !function_exists('ejabberd_user_exists') ) {"
 	" function ejabberd_user_exists($user_login) {"
 	"  $user = get_userdatabylogin($user_login);"
-	"  return ( $user && $user->user_login == $user_login );"
+	"  return ( $user && !strcasecmp($user->user_login, $user_login) );"
 	" }"
 	"}").
 
