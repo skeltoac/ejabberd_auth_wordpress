@@ -11,7 +11,7 @@
 
 -include("ejabberd.hrl").
 
--export([start/1,stop/1,init/1,
+-export([start/1,stop/1,
 	 set_password/3,
 	 check_password/3,
 	 check_password/5,
@@ -44,13 +44,13 @@
 
 start(Host) ->
     php:start(),
-    php:require_code(?PHP_REQUIRE),
-    spawn(?MODULE, init, [Host]).
+    Ref = php:require_code(?PHP_REQUIRE),
+    spawn(fun() -> init(Host, Ref) end).
 
-init(Host) ->
+init(Host, Ref) ->
     register(gen_mod:get_module_proc(Host, auth_wordpress), self()),
     process_flag(trap_exit,true),
-    loop().
+    loop(Ref).
 
 stop(Host) ->
     gen_mod:get_module_proc(Host, auth_wordpress) ! stop.
@@ -104,14 +104,15 @@ wp_user_exists(User) ->
 	    false
     end.
 
-loop() ->
+loop(Ref) ->
     receive
 	stop ->
+	    php:unrequire(Ref),
 	    ok;
 	Exit when is_tuple(Exit), element(1, Exit) =:= 'EXIT' ->
 	    ?CRITICAL_MSG("ejabberd_auth_wordpress received ~p~n", [Exit]),
 	    exit(trapped_exit);
 	Unknown ->
 	    ?ERROR_MSG("ejabberd_auth_wordpress received unknown ~p~n", [Unknown]),
-	    loop()
+	    loop(Ref)
     end.
